@@ -123,9 +123,11 @@ void get_description(char *wmo, char *description)
         strcpy(description, "Overcast");
         break;
     case 45:
+        strcpy(description, "Thin Fog or Ice Fog");
+        break;
     case 48:
         // fog
-        strcpy(description, "Fog or Ice Fog");
+        strcpy(description, "Thick Fog or Ice Fog");
         break;
     case 51:
         strcpy(description, "Light Drizzle");
@@ -152,7 +154,7 @@ void get_description(char *wmo, char *description)
         strcpy(description, "Heavy Freezing Rain");
         break;
     case 71:
-        strcpy(description, "Slight Snow");
+        strcpy(description, "Light Snow");
         break;
     case 73:
         strcpy(description, "Moderate Snow");
@@ -197,13 +199,13 @@ void get_description(char *wmo, char *description)
         if (wmo_code < 20)
             strcpy(description, "Scattered Clouds");
         else if (wmo_code < 30)
-            strcpy(description, "Rain");
+            strcpy(description, "Showers");
         else if (wmo_code < 40)
             strcpy(description, "Snow");
         else if (wmo_code < 50)
             strcpy(description, "Fog");
         else if (wmo_code < 60)
-            strcpy(description, "Rain");
+            strcpy(description, "Drizzle");
         else if (wmo_code < 70)
             strcpy(description, "Rain");
         else if (wmo_code < 80)

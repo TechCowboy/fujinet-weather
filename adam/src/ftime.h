@@ -11,6 +11,8 @@
 #ifndef FTIME_H
 #define FTIME_H
 
+#include <time.h>
+
 typedef struct _ftime
 {
     unsigned short year;
@@ -22,7 +24,7 @@ typedef struct _ftime
     unsigned char dow;
 } Timestamp;
 
-void timestamp(unsigned long t, Timestamp *ts);
+void timestamp(time_t t, Timestamp *ts);
 const char *time_month(unsigned char month);
 const char *time_dow(unsigned char dow);
 

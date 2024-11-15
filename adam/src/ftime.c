@@ -84,7 +84,7 @@ void timestamp(unsigned long t, Timestamp *ts)
 }
 */
 
-void timestamp(unsigned long t, Timestamp *ts)
+void timestamp(time_t t, Timestamp *ts)
 {
     struct tm *tm2;
     

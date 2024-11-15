@@ -26,6 +26,7 @@ typedef struct
   char snow[12];
   char pop[8];
   char desc[MAX_FORECAST];
+
 } ForecastData;
 
 void forecast(void);

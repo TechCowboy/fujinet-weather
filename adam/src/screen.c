@@ -138,6 +138,14 @@ void screen_colors(unsigned long d, long offset, unsigned char *fg, unsigned cha
     }
 }
 
+void screen_forecast_colors(unsigned long d, long offset, unsigned char *fg, unsigned char *bg, bool *day)
+{
+    *day = false;
+    *fg = VDP_INK_BLACK;
+    *bg = VDP_INK_LIGHT_GREEN;
+}
+
+
 void screen_bigprint_offsets(char *c, unsigned char *c0, unsigned char *c1, unsigned char *c2, unsigned char *c3)
 {
     // 0 2 1 3
@@ -796,9 +804,6 @@ void screen_forecast(unsigned char i, ForecastData *f, unsigned char foregroundC
     unsigned char y = (i % 4) * 5;
     void *param = &udgs;
 
-    foregroundColor = VDP_INK_WHITE;
-    backgroundColor = VDP_INK_DARK_BLUE;
-
     if (y == 0)
     {
         console_ioctl(IOCTL_GENCON_SET_UDGS, &param);
@@ -807,7 +812,7 @@ void screen_forecast(unsigned char i, ForecastData *f, unsigned char foregroundC
         screen_forecast_keys();
 
         gotoxy(x[1],y);
-        vdp_color(backgroundColor, foregroundColor, foregroundColor);
+        vdp_color(VDP_INK_BLACK, VDP_INK_WHITE, VDP_INK_WHITE);
         cprintf("%25s", " ");
 
         gotoxy(x[1],y);
@@ -848,9 +853,18 @@ void screen_forecast(unsigned char i, ForecastData *f, unsigned char foregroundC
     cprintf("%5s", f->hi);
 
     y++;
-    gotoxy(x[1],y);
-    cprintf("%25s", f->desc);
+    gotoxy(x[1], y);
+    cprintf("%-10s", f->pop);
 
+    gotoxy(x[2], y);
+    cprintf("%-10s", f->wind);
+
+    y++;
+    gotoxy(x[1],y);
+    cprintf("%-25s", f->desc);
+
+    gotoxy(x[3], y);
+    cprintf("%-10s", f->rain);
 }
 
 void screen_forecast_keys(void)
