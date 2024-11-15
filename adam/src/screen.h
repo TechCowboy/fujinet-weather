@@ -31,7 +31,7 @@ out
 - dayNight:         true = day time
 */
 void screen_colors(unsigned long d, long offset, unsigned char *fg, unsigned char *bg, bool *dayNight);
-
+void screen_forecast_colors(unsigned long d, long offset, unsigned char *fg, unsigned char *bg, bool *day);
 void screen_welcome(void);
 
 void screen_time(FUJI_TIME *current_time, FUJI_TIME *next_update, unsigned char fg, unsigned char bg);

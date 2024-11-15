@@ -53,12 +53,13 @@ Returns
 
 #ifdef USE_METEO
 
-// https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timeformat=unixtime&forecast_days=16
+// https://api.open-meteo.com/v1/forecast?latitude=46.2618&longitude=-63.6726&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timeformat=unixtime&forecast_days=16
+// https://api.open-meteo.com/v1/forecast?latitude=46.2618&longitude=-63.6726&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&timeformat=unixtime&forecast_days=16&timezone=AST
 
 bool forecast_open(void) // METEO
 {
     Timestamp ts;
-    char url[256];
+    char url[MAX_URL];
     char units[80];
 
     get_timezone_from_position(timezone, sizeof(timezone), locData.latitude, locData.longitude);
@@ -69,15 +70,15 @@ bool forecast_open(void) // METEO
       strncpy2(units, "temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&", sizeof(units));
 
     snprintf(url, sizeof(url),
-              "N:HTTP://" ME_API "//v1//forecast?"
-              "latitude=%s&"
-              "longitude=%s&"
-              "daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&"
-              "%s"
-              "timeformat=unixtime&"
-              "forecast_days=16&"
-              "timezone=%s",
-              locData.latitude, locData.longitude, units, timezone);
+             "N:HTTP://" ME_API "//v1//forecast?"
+             "latitude=%s&"
+             "longitude=%s&"
+             "daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&"
+             "%s"
+             "timeformat=unixtime&"
+             "forecast_days=16&"
+             "timezone=%s",
+             locData.latitude, locData.longitude, units, timezone);
 
     if (io_json_open(url) == 0)
         return false;
@@ -134,38 +135,38 @@ void forecast_parse(unsigned char i, ForecastData *f) // METEO
     char postfix[20];
     char json_part[30];
     char wmo[10];
+    long forecast_time;
     /*
-{
-  "latitude": 52.52,
-  "longitude": 13.419998,
-  "generationtime_ms": 0.534892082214356,
-  "utc_offset_seconds": 0,
-  "timezone": "GMT",
-  "timezone_abbreviation": "GMT",
-  "elevation": 38,
-  "daily_units": {
-    "time": "unixtime",
-    "weather_code": "wmo code",
-    "temperature_2m_max": "°F",
-    "temperature_2m_min": "°F",
-    "uv_index_max": "",
-    "precipitation_sum": "inch",
-    "precipitation_probability_max": "%",
-    "wind_speed_10m_max": "mp/h",
-    "wind_direction_10m_dominant": "°"
-  },
-  "daily": {
-    "time": [1731283200, 1731369600, 1731456000, 1731542400, 1731628800, 1731715200, 1731801600, 1731888000, 1731974400, 1732060800, 1732147200, 1732233600, 1732320000, 1732406400, 1732492800,1732579200], 
-    "weather_code": [45, 61, 61, 3, 3, 3, 3, 61, 3, 45, 3, 51, 3, 45, 45, 3], 
-    "temperature_2m_max": [42.3, 40.9, 46.6, 45.7, 45.6, 46.4, 42.9, 41.2, 38.1, 37.2, 36.5, 36.3, 36.7, 36.1, 42.7, 46.8], 
-    "temperature_2m_min": [35.1, 38.8, 37.3, 36.8, 41.2, 39.1, 36.8, 37.4, 32.8, 34.5, 34.1, 30.8, 30, 30, 32, 42.9], 
-    "uv_index_max": [0.5, 1, 1.4, 1.5, 1.55, 1.45, 0.9, 0.75, 0.75, 0.1, 0.7, 1.05, 1.2, 1.2, 0.25, 0.15], 
-    "precipitation_sum": [0, 0, 0.028, 0, 0, 0, 0, 0.283, 0, 0, 0, 0.059, 0, 0, 0, null],
-    "precipitation_probability_max": [10, 18, 28, 15, 0, 5, 15, 23, 26, 23, 41, 42, 23, 19, 20, 30],
-    "wind_speed_10m_max": [5.7, 5.3, 6, 6, 5.4, 6, 5.7, 7.5, 11.8, 14.8, 13.9, 11.2, 9.3, 6.8, 12.5, 8],
-    "wind_direction_10m_dominant": [127, 52, 304, 250, 256, 206, 195, 239, 167, 247, 248, 220, 226, 270, 191, 169]
-  }
-}
+    {
+      "latitude": 46.26653,
+      "longitude": -63.662872,
+      "generationtime_ms": 0.351905822753906,
+      "utc_offset_seconds": -14400,
+      "timezone": "America/Halifax",
+      "timezone_abbreviation": "AST",
+      "elevation": 18,
+      "daily_units": {
+        "time": "unixtime",
+        "weather_code": "wmo code",
+        "temperature_2m_max": "°C",
+        "temperature_2m_min": "°C",
+        "uv_index_max": "",
+        "precipitation_probability_max": "%",
+        "precipitation_sum": "mm",
+        "wind_speed_10m_max": "km/h",
+        "wind_direction_10m_dominant": "°"
+      },
+      "daily": {
+        "time": [1731470400, 1731556800, 1731643200, 1731729600, 1731816000, 1731902400, 1731988800, 1732075200, 1732161600, 1732248000, 1732334400, 1732420800, 1732507200, 1732593600, 1732680000,
+    1732766400], "weather_code": [51, 3, 75, 61, 51, 3, 3, 3, 3, 53, 3, 3, 55, 51, 3, 3], "temperature_2m_max": [2.1, 1.8, 8.3, 8.4, 6.9, 6.2, 4.5, 5.1, 7.7, 9.9, 7.4, 5.2, 7.4, 7.6, 2.4, 1.1],
+        "temperature_2m_min": [-0.4, -0.3, 1.8, 6.9, 4.5, 3.5, 3.1, 2.7, 3, 6.3, 4.3, 3.4, 2.9, 2.7, -0.2, -1],
+        "uv_index_max": [2.45, 2.3, 0.4, 0.3, 0.55, 2, 0.85, 1.7, 0.5, 1.75, 1.2, 1.85, 1.95, 1.95, 1.4, 1],
+        "precipitation_probability_max": [38, 53, 98, 87, 67, 42, 42, 28, 36, 36, 29, 29, 35, 28, 19, 23],
+        "precipitation_sum": [0.1, 0, 11.1, 8.4, 0.6, 0, 0, 0, 0, 4.5, 0, 0, 6.6, 0.3, 0, null],
+        "wind_speed_10m_max": [37.8, 37.3, 48, 35.8, 34.2, 22.5, 32.3, 28.2, 46.2, 61.5, 19.7, 22.7, 39, 45.8, 50.1, 51.2],
+        "wind_direction_10m_dominant": [344, 356, 359, 289, 302, 287, 314, 315, 93, 136, 252, 295, 153, 272, 270, null]
+      }
+    }
     */
 
     io_json_query("/utc_offset_seconds", json_part, sizeof(json_part));
@@ -180,7 +181,12 @@ void forecast_parse(unsigned char i, ForecastData *f) // METEO
 
     snprintf(request, sizeof(request), "%stime%s", prefix,postfix);
     io_json_query(request, json_part, sizeof(json_part));
-    timestamp(atol(json_part)+timezone_offset, &ts);
+
+    forecast_time = atol(json_part);
+
+    // change it to local time
+    forecast_time += timezone_offset;
+    timestamp((unsigned long) forecast_time, &ts);
 
     snprintf(f->date, 8, "%d %s", ts.day, time_month(ts.month));
     snprintf(f->dow, 4, "%s", time_dow(ts.dow));
@@ -192,10 +198,12 @@ void forecast_parse(unsigned char i, ForecastData *f) // METEO
     snprintf(request, sizeof(request), "%stemperature_2m_min%s", prefix, postfix);
     io_json_query(request, f->lo, sizeof(f->lo));
     io_decimals(f->lo, optData.maxPrecision);
+    strcat(f->lo, optData.units == IMPERIAL ? "F" : "C");
 
-    snprintf(request, sizeof(request), "%stemperature_2m_max%s", prefix, postfix);
+        snprintf(request, sizeof(request), "%stemperature_2m_max%s", prefix, postfix);
     io_json_query(request, f->hi, sizeof(f->hi));
     io_decimals(f->hi, optData.maxPrecision);
+    strcat(f->hi, optData.units == IMPERIAL ? "F" : "C");
 
     //snprintf(request, sizeof(request), "%spressure", prefix);
     //io_json_query(request, f->pressure, sizeof(f->pressure));
@@ -204,17 +212,22 @@ void forecast_parse(unsigned char i, ForecastData *f) // METEO
     snprintf(request, sizeof(request), "%swind_speed_10m_max%s", prefix, postfix);
     io_json_query(request, json_part, sizeof(json_part));
     io_decimals(json_part, optData.maxPrecision);
-    snprintf(f->wind, sizeof(f->wind), "WIND:%s %s ", json_part, optData.units == IMPERIAL ? "mph" : "kph");
+    snprintf(f->wind, sizeof(f->wind), "WIND:%s%s ", json_part, optData.units == IMPERIAL ? "mph" : "kph");
 
     snprintf(request, sizeof(request), "%swind_direction_10m_dominant%s", prefix, postfix);
     io_json_query(request, json_part, sizeof(json_part));
     strcat(f->wind, degToDirection(atoi(json_part)));
 
     snprintf(request, sizeof(request), "%sprecipitation_probability_max%s", prefix, postfix);
-    io_json_query(request, f->pop, sizeof(f->pop));
+    io_json_query(request, json_part, sizeof(json_part));
+    snprintf(f->pop, sizeof(f->pop), "POP:%s%%", json_part);
 
     snprintf(request, sizeof(request), "%sprecipitation_sum%s", prefix, postfix);
-    io_json_query(request, f->rain, sizeof(f->rain));
+    io_json_query(request, json_part, sizeof(json_part));
+    if (strcmp(json_part, "0") != 0)
+      snprintf(f->rain, sizeof(f->rain), "AMT:%s%s", json_part, optData.units == IMPERIAL ? "in" : "mm");
+    else
+      strncpy2(f->rain, "", sizeof(f->rain));
 
     // snprintf(request,  sizeof(request),"%ssnow", prefix);
     // io_json_query(request, f->snow, sizeof(f->snow));
@@ -305,8 +318,10 @@ static  FUJI_TIME adjust_time;
     screen_forecast_init();
     
     screen_colors(dt, timezone_offset, &fg, &bg, &dayNight);
-    
-    if (forecast_open())
+    screen_forecast_colors(dt, timezone_offset, &fg, &bg, &dayNight);
+
+
+        if (forecast_open())
       screen_weather_could_not_get();
     else
     { 
