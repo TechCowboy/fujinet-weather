@@ -23,6 +23,7 @@
 
 char dummy[1024];
 
+//#define VERBOSE
 unsigned char FAKE_eos_write_character_device(unsigned char dev, void *buf, unsigned short len)
 {
     FUJI_CMD *fc = (FUJI_CMD *) buf;
@@ -35,15 +36,21 @@ static FUJI_TIME adjust;
 
     if ((dev == FUJI_DEV) || (dev == NET_DEV))
     {
+#ifdef VERBOSE
         cprintf("write ");
+#endif
         switch(dev)
         {
             case FUJI_DEV:
-                cprintf("FUJI ");
+#ifdef VERBOSE
+     cprintf("FUJI ");
+#endif
                 switch (fc->cmd)
                 {
                     case 0xD2:
+#ifdef VERBOSE
                         cprintf("Get Time");
+#endif
                         if (firstTime)
                         {
                             firstTime = false;
@@ -66,16 +73,24 @@ static FUJI_TIME adjust;
 
                         break;
                     case 0xDB:
+#ifdef VERBOSE
                         cprintf("Close App Key");
+#endif
                         break;
                     case 0xDC:
+#ifdef VERBOSE
                         cprintf("Open App Key");
+#endif
                         break;
                     case 0xDD:
+#ifdef VERBOSE
                         cprintf("Read App Key");
+#endif
                         break;
                     case 0xDE:
+#ifdef VERBOSE
                         cprintf("Write App Key");
+#endif
                         break;
                     default:
                         cprintf("Unknown %02x\n", fc->cmd);
@@ -84,39 +99,53 @@ static FUJI_TIME adjust;
                 break;
 
             case NET_DEV:
+#ifdef VERBOSE
                 cprintf("NET  ");
+#endif
                 switch(fc->cmd)
                 {
                     case 0xFC:
+#ifdef VERBOSE
                         cprintf("Set Channel Mode ");
                         if (sc->mode == 0)
                             cprintf("PROTOCOL");
                         else
                             cprintf("JSON");
                         csleep(DEBUG_DELAY);
+#endif
                         break;
                     case 'O':
+#ifdef VERBOSE
                         cprintf("Open %s", fc->url);
                         csleep(DEBUG_DELAY);
+#endif
                         break;
                     case 'C':
+#ifdef VERBOSE
                         cprintf("Close");
                         csleep(DEBUG_DELAY);
+#endif
                         break;
                     case 'P':
+#ifdef VERBOSE
                         cprintf("Parse JSON");
                         csleep(DEBUG_DELAY);
+#endif
                         break;
                     case 'Q':
+#ifdef VERBOSE
                         cprintf("Query JSON '%s' \n", jq->query);
                         csleep(DEBUG_DELAY);
+#endif
                         break;
                 }
                 break;
             default:
                 break; 
         } // switch dev
+#ifdef VERBOSE
         cprintf("\n");
+#endif
         
         return ACK;
     } else

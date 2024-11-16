@@ -7,12 +7,14 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+//#define NO_FUJI
+
 #define CLIENT_VERSION "1.1"
 
 #define USE_METEO
 
 #define MAX_URL      (512)
-#define DEBUG_DELAY  (400)
+#define DEBUG_DELAY  (0)
 #define MAX_APP_DATA (128)
 #define MAX_QUERY    (128)
 

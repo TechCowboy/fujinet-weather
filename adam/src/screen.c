@@ -533,7 +533,7 @@ void screen_welcome(void)
     smartkeys_sound_init();
 
         // Fujinet Logo
-    cprintf("\x20\x20\x20\x20\x20\x9A\x9B\x9C\x20\x20\x20\x20\x20       OPEN WEATHER");
+    cprintf("\x20\x20\x20\x20\x20\x9A\x9B\x9C\x20\x20\x20\x20\x20      METEO WEATHER");
     cprintf("\x80\x81\x82\x83\x84\x94\x95\x96\x8A\x8B\x8C\x8D\x8e       CLIENT " CLIENT_VERSION "\n");
     cprintf("\x85\x86\x87\x88\x89\x97\x98\x99\x8F\x90\x91\x92\x93           for\n");
     cprintf("\x20\x20\x20\x20\x20\x20\x9D\x9E\x9F\x20\x20\x20\x20       COLECO  ADAM\n");
@@ -799,72 +799,115 @@ void screen_forecast_parsing(void)
 void screen_forecast(unsigned char i, ForecastData *f, unsigned char foregroundColor, unsigned char backgroundColor, bool day, FUJI_TIME *future)
 {
     //                    i  D  d   l   h
-    unsigned char x[5] = {0, 7, 15, 21, 27};
+    unsigned char x[5] = {0, 5, 15, 21, 27};
     unsigned char iy[5] = {15, 55, 90, 128};
-    unsigned char y = (i % 4) * 5;
+    unsigned char ty[5] = {2, 7, 12, 17};
+    unsigned char y = (i % 4);
     void *param = &udgs;
+    unsigned char line[28];
+    int k;
+    
 
     if (y == 0)
     {
+        memset(line, ' ', sizeof(line)-1);
+        line[sizeof(line)-1] = 0;
         console_ioctl(IOCTL_GENCON_SET_UDGS, &param);
+
         vdp_color(foregroundColor, backgroundColor, backgroundColor);
         clrscr();
         screen_forecast_keys();
 
-        gotoxy(x[1],y);
-        vdp_color(VDP_INK_BLACK, VDP_INK_WHITE, VDP_INK_WHITE);
-        cprintf("%25s", " ");
+        vdp_color(foregroundColor, backgroundColor, backgroundColor);
+        gotoxy(16-strlen(locData.city)/2,0);
+        cprintf("%s", locData.city);
 
-        gotoxy(x[1],y);
-        cprintf("  DATE");
+        // Cyan column for icons
+        vdp_color(VDP_INK_BLACK, VDP_INK_CYAN, VDP_INK_CYAN);
+        for (k=1;k<21; k++)
+        {
+            gotoxy(0,k);
+            cprintf("     ");
+        }
 
-        gotoxy(x[2],y);
+        
+        // data fields - white background
+        for(int k=0;k<4;k++)
+        {
+            int j;
+
+            line[26] = ' ';
+            vdp_color(VDP_INK_BLACK, VDP_INK_WHITE, VDP_INK_CYAN);
+
+            for(j=0; j<3; j++)
+            {
+                gotoxy(x[1],ty[k]+j);
+                cprintf(line);
+            }
+
+            // shadow
+            vdp_color(VDP_INK_BLACK, VDP_INK_BLACK, VDP_INK_CYAN);
+            gotoxy(x[1]+1, ty[k]+j);
+            line[26] = 0;
+            cprintf(line);
+        }
+
+        line[26] = ' ';
+        vdp_color(VDP_INK_WHITE, VDP_INK_BLACK, VDP_INK_CYAN);
+        // column titles
+        gotoxy(x[1],1);
+        
+        cprintf(line);
+
+        gotoxy(x[1]+2,1);
+        cprintf("DATE");
+
+        gotoxy(x[2],1);
         cprintf("DAY");
 
-        gotoxy(x[3],y);
+        gotoxy(x[3],1);
         cprintf("LOW");
 
-        gotoxy(x[4],y);
+        gotoxy(x[4],1);
         cprintf("HIGH");    
 
     }
 
     vdp_color(foregroundColor, backgroundColor, backgroundColor);
-    y += 2;
 
     // icon
     save_sprite(4, iy[i], f->icon, day);
     display_sprites();
 
+    vdp_color(VDP_INK_BLACK, VDP_INK_WHITE, VDP_INK_WHITE);
     // date
-    gotoxy(x[1],y);
+    gotoxy(x[1],ty[y]);
     cprintf("%5s", f->date);
 
     // day of week
-    gotoxy(x[2],y);
+    gotoxy(x[2],ty[y]);
     cprintf("%-5s", f->dow);
 
     // Low
-    gotoxy(x[3],y);
+    gotoxy(x[3],ty[y]);
     cprintf("%5s", f->lo);
 
     // High
-    gotoxy(x[4],y);
+    gotoxy(x[4],ty[y]);
     cprintf("%5s", f->hi);
 
-    y++;
-    gotoxy(x[1], y);
+
+    gotoxy(x[1], ty[y]+1);
     cprintf("%-10s", f->pop);
 
-    gotoxy(x[2], y);
+    gotoxy(x[2], ty[y]+1);
     cprintf("%-10s", f->wind);
 
-    y++;
-    gotoxy(x[1],y);
+    gotoxy(x[1],ty[y]+2);
     cprintf("%-25s", f->desc);
 
-    gotoxy(x[3], y);
-    cprintf("%-10s", f->rain);
+    gotoxy(32-strlen(f->rain), ty[y]+2);
+    cprintf("%s", f->rain);
 }
 
 void screen_forecast_keys(void)
