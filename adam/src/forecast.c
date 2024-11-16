@@ -225,7 +225,7 @@ void forecast_parse(unsigned char i, ForecastData *f) // METEO
     snprintf(request, sizeof(request), "%sprecipitation_sum%s", prefix, postfix);
     io_json_query(request, json_part, sizeof(json_part));
     if (strcmp(json_part, "0") != 0)
-      snprintf(f->rain, sizeof(f->rain), "AMT:%s%s", json_part, optData.units == IMPERIAL ? "in" : "mm");
+      snprintf(f->rain, sizeof(f->rain), "%s%s", json_part, optData.units == IMPERIAL ? "in" : "mm");
     else
       strncpy2(f->rain, "", sizeof(f->rain));
 
