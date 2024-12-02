@@ -10,6 +10,13 @@ Please create all forks and enhancements to this application here via forks and 
 # Update Notes
 
 ### ADAM
+
+  Nov 2024 - This version has the following features:
+  1) Get weather data from open-meteo.com
+  2) Additional informatin is included on forecast page
+  3) Fixed possible buffer overflow condition on URL
+  4) Update frequency was inconsistent -- fixed
+     
   June 24 - This version has the following features
   1) Option feature the change polling frequency
   2) Only asks for weather no more than once every 10 minutes
